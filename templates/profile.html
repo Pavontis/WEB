@@ -24,7 +24,6 @@
     {% endwith %}
 
     <div class="row align-items-start">
-      <!-- Левая карточка: редактирование имени пользователя -->
       <div class="col-md-6 mb-4">
         <form method="POST" action="{{ url_for('profile') }}" class="bg-white p-4 rounded shadow-sm d-flex flex-column">
           <h5 class="mb-3">Данные профиля</h5>
@@ -38,7 +37,6 @@
         </form>
       </div>
 
-      <!-- Правая карточка: смена пароля -->
       <div class="col-md-6 mb-4">
         <form method="POST" action="{{ url_for('change_password') }}" class="bg-white p-4 rounded shadow-sm d-flex flex-column">
           <h5 class="mb-3">Сменить пароль</h5>
@@ -57,7 +55,6 @@
       </div>
     </div>
 
-    <!-- Удаление аккаунта -->
     <div class="row">
       <div class="col-md-12 mb-4">
         <form method="POST" action="{{ url_for('delete_account') }}"
