@@ -1,0 +1,31 @@
+<!-- Навигация -->
+<div class="bg-white p-3 border-end shadow-sm" style="width: 250px; min-height: 100vh;">
+   <h5 class="mb-4">📁 Навигация</h5>
+   <ul class="nav flex-column">
+      <li class="nav-item mb-2">
+         <a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}bg-light{% endif %} text-dark rounded px-2 py-1">
+            ➕ Добавить задачу
+         </a>
+      </li>
+      <li class="nav-item mb-2">
+         <a href="{{ url_for('calendar_view') }}" class="nav-link {% if '/calendar' in request.path %}bg-light{% endif %} text-dark rounded px-2 py-1">
+            📅 Календарь
+         </a>
+      </li>
+      <li class="nav-item mb-2">
+         <a href="{{ url_for('stats') }}" class="nav-link {% if request.path == '/stats' %}bg-light{% endif %} text-dark rounded px-2 py-1">
+            📊 Статистика задач
+         </a>
+      </li>
+      <li class="nav-item mb-2">
+         <a href="{{ url_for('update_telegram') }}" class="nav-link {% if request.path == '/update_telegram' %}bg-light{% endif %} text-dark rounded px-2 py-1">
+            🤖 Привязка Telegram
+         </a>
+      </li>
+      <li class="nav-item mb-2">
+         <a href="{{ url_for('profile') }}" class="nav-link {% if request.path == '/profile' %}bg-light{% endif %} text-dark rounded px-2 py-1">
+            ⚙️ Настройки профиля
+         </a>
+      </li>
+   </ul>
+</div>

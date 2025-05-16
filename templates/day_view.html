@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Задачи на день</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📌 Задачи на {{ date }}</h2>
+        <a href="{{ url_for('calendar_view') }}" class="btn btn-outline-secondary btn-sm">← Назад к календарю</a>
+    </div>
+
+    {% if tasks %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for task in tasks %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task[1] }}</h5>
+                        <p class="card-text text-muted">{{ task[2] or 'Описание отсутствует' }}</p>
+                        <span class="badge {% if task[4] %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                            {% if task[4] %}✔ Выполнено{% else %}🕒 Активно{% endif %}
+                        </span>
+                        <a href="{{ url_for('view_task', task_id=task[0]) }}" class="btn btn-sm btn-outline-primary mt-3 float-end">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-5">
+            На этот день задач нет 🙂
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

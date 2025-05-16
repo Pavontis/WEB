@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+   <head>
+      <meta charset="UTF-8">
+      <title>Мой список дел</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   </head>
+   <body class="bg-light">
+      <div class="d-flex">
+         {% include 'navbar.html' %}
+         <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+               <div class="fw-bold">
+                  👋 Привет, {{current_user.username}}!
+               </div>
+               <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Выйти</a>
+            </div>
+            <h1 class="mb-4">📝 Добавление задачи</h1>
+            <!-- Форма добавления задачи -->
+            <form action="/add" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm mb-4">
+               <div class="mb-3">
+                  <input type="text" class="form-control" name="title" placeholder="Название задачи" required>
+               </div>
+               <div class="mb-3">
+                  <select class="form-select" name="tag">
+                     <option value="" selected disabled>Выберите категорию</option>
+                     <option value="Работа">Работа</option>
+                     <option value="Дом">Дом</option>
+                     <option value="Учёба">Учёба</option>
+                     <option value="Личное">Личное</option>
+                     <option value="Другое">Другое</option>
+                  </select>
+               </div>
+               <div class="mb-3">
+                  <textarea class="form-control" name="description" placeholder="Описание задачи"></textarea>
+               </div>
+               <div class="mb-3">
+                  <input type="datetime-local" class="form-control" name="due_date" id="dueDateInput">
+                  <div class="form-check mt-2">
+                     <input class="form-check-input" type="checkbox" id="allDayCheck">
+                     <label class="form-check-label" for="allDayCheck">
+                     Весь день
+                     </label>
+                  </div>
+               </div>
+               <div class="mb-3">
+                  <input type="file" name="attachments" class="form-control" multiple>
+               </div>
+               <button type="submit" class="btn btn-dark">Добавить</button>
+            </form>
+            <script>
+               const checkbox = document.getElementById('allDayCheck');
+               const datetimeInput = document.getElementById('dueDateInput');
+
+               checkbox.addEventListener('change', () => {
+                   if (checkbox.checked) {
+                       datetimeInput.type = 'date';
+                   } else {
+                       datetimeInput.type = 'datetime-local';
+                   }
+               });
+            </script>
+            <!-- Поиск -->
+            <form method="GET" action="/" class="d-flex mb-4">
+               <input type="text" class="form-control me-2" name="search" placeholder="Поиск по названию..." value="{{ request.args.get('search', '') }}">
+               <button class="btn btn-outline-primary" type="submit">🔍 Найти</button>
+            </form>
+            <!-- Фильтры -->
+            <div class="mb-4">
+               <strong>Фильтр по статусу:</strong><br>
+               <a href="{{ url_for('index') }}" class="btn btn-dark btn-sm {% if not request.args.get('filter') %}active{% endif %}">Все</a>
+               <a href="{{ url_for('index', filter='active') }}" class="btn btn-outline-warning btn-sm {% if request.args.get('filter') == 'active' %}active{% endif %}">Активные</a>
+               <a href="{{ url_for('index', filter='done') }}" class="btn btn-outline-success btn-sm {% if request.args.get('filter') == 'done' %}active{% endif %}">Выполненные</a>
+            </div>
+            <div class="mb-4">
+               <strong>Фильтр по категории:</strong><br>
+               <a href="{{ url_for('index') }}" class="btn btn-dark btn-sm {% if not request.args.get('tag') %}active{% endif %}">Все</a>
+               {% for cat in ['Работа', 'Дом', 'Учёба', 'Личное', 'Другое'] %}
+               <a href="{{ url_for('index', tag=cat) }}" class="btn btn-outline-primary btn-sm {% if request.args.get('tag') == cat %}active{% endif %}">{{ cat }}</a>
+               {% endfor %}
+            </div>
+            <!-- Список задач -->
+            <div class="row">
+               {% for task in tasks %}
+               <div class="col-12 mb-3">
+                  <div class="card shadow-sm border-0">
+                     <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                           <h5 class="card-title mb-1">{{ task.title }}</h5>
+                           {% if task.tag %}
+                           <span class="badge bg-secondary rounded-pill">{{ task.tag }}</span>
+                           {% endif %}
+                           <p class="card-text text-muted mb-1">{{ task.description }}</p>
+                           {% if task.due_date %}
+                           <small class="text-muted">Срок: {{ task.due_date.replace('T', ' ') if 'T' in task.due_date else task.due_date }}</small><br>
+                           {% endif %}
+                           {% if task.is_done %}
+                           <span class="badge bg-success mt-2">Выполнено</span>
+                           {% elif task.is_overdue %}
+                           <span class="badge bg-danger mt-2">Просрочено</span>
+                           {% elif task.due_soon %}
+                           <span class="badge bg-warning text-dark mt-2">{{ task.due_soon }}</span>
+                           {% endif %}
+                        </div>
+                        <div>
+                           {% if not task.is_done %}
+                           <a href="/done/{{ task.id }}" class="btn btn-outline-success btn-sm me-1">✓</a>
+                           {% endif %}
+                           <a href="/view/{{ task.id }}" class="btn btn-outline-info btn-sm me-1">👁</a>
+                           <a href="/edit/{{ task.id }}" class="btn btn-outline-primary btn-sm me-1">✏️</a>
+                           <a href="/delete/{{ task.id }}" class="btn btn-outline-danger btn-sm">🗑️</a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь задач</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .calendar-cell {
+            position: relative;
+            height: 120px;
+            overflow: hidden;
+        }
+        .calendar-cell a.stretched-link {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .calendar-cell-content {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="d-flex">
+    {% include 'navbar.html' %}
+    <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
+            <a href="{{ url_for('calendar_view', year=prev_year, month=prev_month) }}"
+               class="btn btn-outline-dark btn-sm position-absolute start-0">
+                ⬅️
+            </a>
+            <h4 class="mb-0 text-center w-100">{{ month_name }} {{ year }} года</h4>
+            <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}"
+               class="btn btn-outline-dark btn-sm position-absolute end-0">
+                ➡️
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <!-- Названия дней недели -->
+                <div class="row text-center fw-bold border-bottom">
+                    <div class="col border py-2">Пн</div>
+                    <div class="col border py-2">Вт</div>
+                    <div class="col border py-2">Ср</div>
+                    <div class="col border py-2">Чт</div>
+                    <div class="col border py-2">Пт</div>
+                    <div class="col border py-2 text-primary">Сб</div>
+                    <div class="col border py-2 text-danger">Вс</div>
+                </div>
+
+                {% for week in calendar %}
+                <div class="row row-cols-7 g-0 text-center">
+                    {% for day in week %}
+                    {% set day_tasks = tasks_by_day.get(day.strftime('%Y-%m-%d'), []) if day else [] %}
+                    {% set task_count = day_tasks|length %}
+                    <div class="col border p-2 text-start calendar-cell"
+                         style="
+                         {% if task_count == 1 %}background-color: #fff3cd;
+                         {% elif task_count == 2 %}background-color: #ffe8a1;
+                         {% elif task_count > 2 %}background-color: #f8d7da;
+                         {% endif %}
+                         ">
+                        {% if day %}
+                            <a href="{{ url_for('view_day', year=day.year, month=day.month, day=day.day) }}" class="stretched-link"></a>
+                            <div class="calendar-cell-content">
+                                <div class="position-absolute top-0 end-0 m-1 fw-bold small text-muted">{{ day.day }}</div>
+                                <div class="mt-3">
+                                    {% for task in day_tasks[:2] %}
+                                    <div style="font-size: 0.75em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ task.title[:30] }}{% if task.title|length > 30 %}...{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                    {% if day_tasks|length > 2 %}
+                                    <div style="font-size: 0.75em; color: gray;">+ ещё {{ day_tasks|length - 2 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
