@@ -188,7 +188,7 @@ def add_task():
     description = request.form.get("description", "")
     due_date = request.form.get("due_date", "")
     all_day = int(bool(request.form.get("all_day", False)))
-    files = request.files.getlist("attachments")  # <-- получаем список файлов
+    files = request.files.getlist("attachments")
     tag = request.form.get("tag", "").strip()
 
     filenames = []
@@ -409,7 +409,6 @@ def calendar_view(year=None, month=None):
     tasks = c.fetchall()
     conn.close()
 
-    # Группируем задачи по дате
     tasks_by_day = {}
     for task in tasks:
         task_id, title, due_date = task
@@ -501,32 +500,27 @@ def stats():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    # Всего задач
     c.execute("SELECT COUNT(*) FROM tasks WHERE user_id = ?", (current_user.id,))
     total_tasks = c.fetchone()[0]
 
-    # Выполненные задачи
     c.execute(
         "SELECT COUNT(*) FROM tasks WHERE user_id = ? AND is_done = 1",
         (current_user.id,),
     )
     done_tasks = c.fetchone()[0]
 
-    # Невыполненные задачи
     c.execute(
         "SELECT COUNT(*) FROM tasks WHERE user_id = ? AND is_done = 0",
         (current_user.id,),
     )
     not_done_tasks = c.fetchone()[0]
 
-    # Задачи по категориям
     c.execute(
         "SELECT tag, COUNT(*) FROM tasks WHERE user_id = ? GROUP BY tag",
         (current_user.id,),
     )
     tag_counts = dict(c.fetchall())
 
-    # Задачи по месяцам
     c.execute("SELECT due_date FROM tasks WHERE user_id = ?", (current_user.id,))
     rows = c.fetchall()
     monthly_counts = defaultdict(int)
