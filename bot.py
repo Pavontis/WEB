@@ -67,20 +67,17 @@ def send_message(chat_id: int, text: str, parse_mode: str = None):
 
 
 def handle_start(chat_id: int, text: str):
-    # Проверяем, есть ли уже в БД этот chat_id
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT 1 FROM users WHERE chat_id = ?", (chat_id,))
     already = c.fetchone()
     if already:
         conn.close()
-        return  # уже привязан — ничего не шлём повторно
-    # Иначе — запоминаем chat_id и шлём единожды
+        return
     c.execute("UPDATE users SET chat_id = ? WHERE id = (SELECT id FROM users WHERE chat_id IS NULL LIMIT 1)", (chat_id,))
     conn.commit()
     conn.close()
 
-    # А теперь разово отсылаем приветствие
     send_message(chat_id, "Привет! Я Telegram-бот для напоминаний о задачах.")
     send_message(
         chat_id,
@@ -195,8 +192,8 @@ def main_loop():
 
 if __name__ == "__main__":
     if '--cron' in sys.argv:
-        process_updates_once()    # сначала обрабатываем /start
-        send_hour_reminders()     # потом часовые
-        send_day_reminders()      # и потом суточные
+        process_updates_once()
+        send_hour_reminders()
+        send_day_reminders()
     else:
-        main_loop()               # редкий ручной запуск
+        main_loop()

@@ -385,7 +385,7 @@ def calendar_view(year=None, month=None):
     today = date.today()
     year = year or today.year
     month = month or today.month
-    month_name = calendar.month_name[month]
+    month_name = MONTH_NAMES[month]
 
     prev_month = month - 1
     prev_year = year
